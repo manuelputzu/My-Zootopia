@@ -8,31 +8,61 @@ def load_data(file_path):
         return json.load(handle)
 
 
-# Function to print the animal information
-def print_animal_info(animals_data):
+# Function to generate HTML content for each animal
+def generate_animal_info(animals_data):
+    output = ''
     for animal in animals_data:
-        # Print Name
+        # Start creating the HTML block for each animal
+        output += "<li class='cards__item'>\n"
+
+        # Add Name
         if 'name' in animal:
-            print(f"Name: {animal['name']}")
+            output += f"<div class='card__title'>Name: {animal['name']}</div>\n"
 
-        # Print Diet
+        # Add Diet
         if 'characteristics' in animal and 'diet' in animal['characteristics']:
-            print(f"Diet: {animal['characteristics']['diet']}")
+            output += f"<div class='card__text'>Diet: {animal['characteristics']['diet']}</div>\n"
 
-        # Print Location
+        # Add Location
         if 'locations' in animal and len(animal['locations']) > 0:
-            print(f"Location: {animal['locations'][0]}")
+            output += f"<div class='card__text'>Location: {animal['locations'][0]}</div>\n"
 
-        # Print Type
+        # Add Type
         if 'characteristics' in animal and 'type' in animal['characteristics']:
-            print(f"Type: {animal['characteristics']['type']}")
+            output += f"<div class='card__text'>Type: {animal['characteristics']['type']}</div>\n"
 
-        # Add a separator between animals
-        print()  # Print a new line for better readability
+        # Close the HTML block for the animal
+        output += "</li>\n"
+
+    return output
 
 
-# Load the data from animals_data.json
-animals_data = load_data('/Users/manuelputzu/Documents/2024/Masterschool/PyCharm/Academy/SE104_intro_to_web/SE104_4_css/css_zootopia/animals_data.json')
+# Function to write the updated HTML content
+def write_html_file(template_path, output_html_path, animals_info):
+    # Read the HTML template
+    with open(template_path, 'r') as file:
+        html_content = file.read()
 
-# Print the animals' information
-print_animal_info(animals_data)
+    # Replace the placeholder with the generated animal information
+    updated_html_content = html_content.replace("__REPLACE_ANIMALS_INFO__", animals_info)
+
+    # Write the updated HTML to a new file
+    with open(output_html_path, 'w') as file:
+        file.write(updated_html_content)
+
+
+# Main function to run the script
+def main():
+    # Load the animal data
+    animals_data = load_data('animals_data.json')
+
+    # Generate the animal info HTML
+    animals_info_html = generate_animal_info(animals_data)
+
+    # Write the updated HTML content to a new file
+    write_html_file('animals_template.html', 'animals.html', animals_info_html)
+
+
+# Run the main function
+if __name__ == "__main__":
+    main()
