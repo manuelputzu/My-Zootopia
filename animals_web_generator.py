@@ -13,26 +13,26 @@ def generate_animal_info(animals_data):
     output = ''
     for animal in animals_data:
         # Start creating the HTML block for each animal
-        output += "<li class='cards__item'>\n"
+        output += '<li class="cards__item">\n'
 
         # Add Name
         if 'name' in animal:
-            output += f"<div class='card__title'>Name: {animal['name']}</div>\n"
+            output += f"Name: {animal['name']}<br/>\n"
 
         # Add Diet
         if 'characteristics' in animal and 'diet' in animal['characteristics']:
-            output += f"<div class='card__text'>Diet: {animal['characteristics']['diet']}</div>\n"
+            output += f"Diet: {animal['characteristics']['diet']}<br/>\n"
 
         # Add Location
         if 'locations' in animal and len(animal['locations']) > 0:
-            output += f"<div class='card__text'>Location: {animal['locations'][0]}</div>\n"
+            output += f"Location: {animal['locations'][0]}<br/>\n"
 
         # Add Type
         if 'characteristics' in animal and 'type' in animal['characteristics']:
-            output += f"<div class='card__text'>Type: {animal['characteristics']['type']}</div>\n"
+            output += f"Type: {animal['characteristics']['type']}<br/>\n"
 
         # Close the HTML block for the animal
-        output += "</li>\n"
+        output += '</li>\n'
 
     return output
 
