@@ -1,30 +1,42 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-API_KEY = 'R0ureXSm0jjtgBL5vVbpIg==V54rVqIItJYSAZT7'
+# Load environment variables from .env file
+load_dotenv()
 
-def fetch_data(name):
+# Grab the API key from the environment
+API_KEY = os.getenv('API_KEY')
+
+
+def fetch_data(animal_name):
     """
-    Fetches the animal data.
+    This function talks to the API and gets the animal data.
+    It returns a list of animals, where each animal is a dictionary.
     """
-    api_url = f'https://api.api-ninjas.com/v1/animals?name={name}'
+    api_url = f'https://api.api-ninjas.com/v1/animals?name={animal_name}'
     headers = {
-        'X-Api-Key': API_KEY
+        'X-Api-Key': API_KEY  # Using the API key from the .env file
     }
 
-    # Send GET request
+    # Send the request to the API
     response = requests.get(api_url, headers=headers)
 
-    # Check if request is successful
+    # Check if everything went okay (status code 200 means success)
     if response.status_code == 200:
-        return response.json()
+        return response.json()  # If good, return the data in JSON form
     else:
-        raise Exception(f"Sorry there is a Failure: {response.status_code}")
+        # If something went wrong, raise an error and show the status code
+        raise Exception(f"Failed to fetch data. HTTP Status code: {response.status_code}")
 
 
 def search_animal(animals_data, search_name):
-    """Search for the animal"""
-    found = False
+    """Looks through the list to find a specific animal."""
+    found = False  # Start by assuming it's not there
+
     for animal in animals_data:
+        # If the name matches (case doesn't matter), mark as found
         if animal.get('name', '').lower() == search_name.lower():
             found = True
-    return found
+
+    return found  # Return True if we found it, False if not

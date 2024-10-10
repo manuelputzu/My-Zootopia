@@ -1,0 +1,7 @@
+# Ignore .env file (so API keys aren't exposed)
+.env
+
+# Ignore IDE settings and virtual environments (if needed)
+.idea/
+.venv/
+
