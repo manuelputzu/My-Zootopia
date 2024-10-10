@@ -1,58 +1,23 @@
-import requests
-
-
-# Function to get animal data from the API
-def get_animal_data(name, api_key):
-    """ Fetch animal data from the API based on the animal's name. """
-    api_url = f'https://api.api-ninjas.com/v1/animals?name={name}'
-
-    # The headers with the API key
-    headers = {
-        'X-Api-Key': api_key
-    }
-
-    # Send GET request to the API
-    response = requests.get(api_url, headers=headers)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        return response.json()  # Return the parsed JSON data
-    else:
-        raise Exception(f"Failed to fetch data. HTTP Status code: {response.status_code}")
-
-
-def search_animal(animals_data, search_name):
-    """Search for the animal in the fetched data."""
-    found = False # Flag to check if animal in database
-
-    for animal in animals_data:
-        if animal.get('name', '').lower() == search_name.lower():
-            found = True # Mark as found
-
-    return found
-
+import data_fetcher
 
 # Function to generate HTML content for each animal in the new format
 def generate_animal_info(animals_data):
+    """Builds HTML for animal data."""
     output = ''
     for animal in animals_data:
         output += '<li class="cards__item">\n'
 
-        # Add Name as a title
         if 'name' in animal:
             output += f"<div class='card__title'>{animal['name']}</div>\n"
 
         output += "<p class='card__text'>\n"
 
-        # Add Location
         if 'locations' in animal and len(animal['locations']) > 0:
             output += f"<strong>Location:</strong> {animal['locations'][0]}<br/>\n"
 
-        # Add Type
         if 'characteristics' in animal and 'type' in animal['characteristics']:
             output += f"<strong>Type:</strong> {animal['characteristics']['type']}<br/>\n"
 
-        # Add Diet
         if 'characteristics' in animal and 'diet' in animal['characteristics']:
             output += f"<strong>Diet:</strong> {animal['characteristics']['diet']}<br/>\n"
 
@@ -62,49 +27,52 @@ def generate_animal_info(animals_data):
 
 
 # Function to write the updated HTML content
-def write_html_file(template_path, output_html_path, animals_info):
-    # Read the HTML template
-    with open(template_path, 'r') as file: # Read the HTML template
+def write_html_file(template_file, output_file, animals_info):
+    """
+    Reads the HTML template, replaces placeholder with the
+    animal info, and writes it to a new HTML file.
+    """
+    with open(template_file, 'r') as file:  # open the template file
         html_content = file.read()
 
-    # Replace the placeholder with the generated animal information
+    # Replace the placeholder in the template with the animal info
     updated_html_content = html_content.replace("__REPLACE_ANIMALS_INFO__", animals_info)
 
-    # Write the updated HTML to a new file
-    with open(output_html_path, 'w') as file:
+    # Write the updated content to the output file
+    with open(output_file, 'w') as file:
         file.write(updated_html_content)
 
 
 # Main function to run the script
 def main():
-    search_name = input("Please enter a name of an animal: ")  # The name of the animal you want to search for
-    api_key = 'R0ureXSm0jjtgBL5vVbpIg==V54rVqIItJYSAZT7'  # API Key
+    # Prompt user for an animal name
+    animal_name = input("Please enter an animal: ")
 
-    # Define the paths for the template and output
-    template_path = 'animals_template.html'
-    output_html_path = 'animals.html'
+    # Define the template and output files
+    template_file = 'animals_template.html'  # The HTML template file
+    output_file = 'animals.html'  # Where to save the generated HTML
 
     try:
         # Fetch the animal data
-        animals_data = get_animal_data(search_name, api_key)
+        animals_data = data_fetcher.fetch_data(animal_name)
 
-        # Check if the animal exists using search_animal()
-        if search_animal(animals_data, search_name):
+        # Check if the animal exists in the data
+        if data_fetcher.search_animal(animals_data, animal_name):
             # Generate the animal info HTML
             animals_info_html = generate_animal_info(animals_data)
         else:
-            # Display Error Message if the animal does not exist
-            animals_info_html = f"<h2>You entered: '{search_name}'.\n That animal doesn't exist in our database.</h2>\n"
+            # If animal doesn't exist, show an error message in HTML
+            animals_info_html = f"<h2>You entered: '{animal_name}'.\nThat animal doesn't exist in our database.</h2>\n"
 
-        # Write the updated HTML content to a new file
-        write_html_file(template_path, output_html_path, animals_info_html)
+        # Write the updated HTML content to the output file
+        write_html_file(template_file, output_file, animals_info_html)
 
-        print(f"Successfully wrote animal data to {output_html_path}")
+        print(f"Successfully wrote animal data to {output_file}")
 
     except Exception as e:
+        # Print any errors that occurred
         print(f"Error: {e}")
 
 
-# Run the main function
 if __name__ == "__main__":
     main()
