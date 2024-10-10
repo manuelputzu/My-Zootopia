@@ -21,6 +21,17 @@ def get_animal_data(name, api_key):
         raise Exception(f"Failed to fetch data. HTTP Status code: {response.status_code}")
 
 
+def search_animal(animals_data, search_name):
+    """Search for the animal in the fetched data."""
+    found = False # Flag to check if animal in database
+
+    for animal in animals_data:
+        if animal.get('name', '').lower() == search_name.lower():
+            found = True # Mark as found
+
+    return found
+
+
 # Function to generate HTML content for each animal in the new format
 def generate_animal_info(animals_data):
     output = ''
@@ -77,8 +88,13 @@ def main():
         # Fetch the animal data
         animals_data = get_animal_data(search_name, api_key)
 
-        # Generate the animal info HTML
-        animals_info_html = generate_animal_info(animals_data)
+        # Check if the animal exists using search_animal()
+        if search_animal(animals_data, search_name):
+            # Generate the animal info HTML
+            animals_info_html = generate_animal_info(animals_data)
+        else:
+            # Display Error Message if the animal does not exist
+            animals_info_html = f"<h2>You entered: '{search_name}'.\n That animal doesn't exist in our database.</h2>\n"
 
         # Write the updated HTML content to a new file
         write_html_file(template_path, output_html_path, animals_info_html)
